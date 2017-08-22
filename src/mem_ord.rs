@@ -9,15 +9,6 @@ pub trait MemOrd: MemEq {
     fn mem_cmp(&self, other: &Self) -> Ordering;
 }
 
-macro_rules! impl_specialized {
-    ($($t:ty)+) => {
-        $(#[cfg(feature = "specialization")]
-        impl MemOrd for $t {
-            fn mem_cmp(&self, other: &Self) -> Ordering { self.cmp(other) }
-        })+
-    }
-}
-
 #[inline(always)]
 fn _mem_cmp<T>(this: &T, other: &T) -> Ordering {
     match unsafe { _memcmp(this, other) } {
@@ -34,6 +25,15 @@ impl<T> MemOrd for T {
 
     #[cfg(not(feature = "specialization"))]
     fn mem_cmp(&self, other: &Self) -> Ordering { _mem_cmp(self, other) }
+}
+
+macro_rules! impl_specialized {
+    ($($t:ty)+) => {
+        $(#[cfg(feature = "specialization")]
+        impl MemOrd for $t {
+            fn mem_cmp(&self, other: &Self) -> Ordering { self.cmp(other) }
+        })+
+    }
 }
 
 impl_specialized!(u8 u16 u32 u64 usize);
