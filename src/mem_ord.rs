@@ -1,4 +1,4 @@
-use core::cmp::Ordering;
+use core::cmp::{self, Ordering};
 use core::mem;
 use ext::*;
 use mem_eq::MemEq;
@@ -10,13 +10,18 @@ pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
     fn mem_cmp(&self, other: &Rhs) -> Ordering;
 }
 
+fn convert(cmp: i32, size_a: usize, size_b: usize) -> Ordering {
+    match cmp {
+        _ if cmp < 0 => Ordering::Less,
+        _ if cmp > 0 => Ordering::Greater,
+        _ => size_a.cmp(&size_b)
+    }
+}
+
 #[inline(always)]
 fn _mem_cmp<T, U>(this: &T, other: &U) -> Ordering {
-    match unsafe { _memcmp(this, other, 1) } {
-        x if x < 0 => Ordering::Less,
-        x if x > 0 => Ordering::Greater,
-        _ => mem::size_of::<T>().cmp(&mem::size_of::<U>()),
-    }
+    let cmp = unsafe { _memcmp(this, other, 1) };
+    convert(cmp, mem::size_of::<T>(), mem::size_of::<U>())
 }
 
 impl<T, U> MemOrd<U> for T {
@@ -26,6 +31,18 @@ impl<T, U> MemOrd<U> for T {
 
     #[cfg(not(feature = "specialization"))]
     fn mem_cmp(&self, other: &U) -> Ordering { _mem_cmp(self, other) }
+}
+
+impl<T, U> MemOrd<[U]> for [T] {
+    fn mem_cmp(&self, other: &[U]) -> Ordering {
+        let size_a = mem::size_of_val(self);
+        let size_b = mem::size_of_val(other);
+        let cmp = unsafe {
+            let size = cmp::min(size_a, size_b);
+            memcmp(self.as_ptr() as _, other.as_ptr() as _, size)
+        };
+        convert(cmp, size_a, size_b)
+    }
 }
 
 macro_rules! impl_specialized {
@@ -92,11 +109,17 @@ mod tests {
 
     #[test]
     fn different_sizes() {
+        macro_rules! helper {
+            ($a:expr, $b:expr, $ord:expr) => {
+                assert_eq!($a.mem_cmp(&$b), $ord);
+                assert_eq!($a[..].mem_cmp(&$b[..]), $ord);
+            }
+        }
         let a = [0u8, 0, 0];
         let b = [0u8, 0, 2];
         let c = [0u8; 0];
-        assert_eq!(a.mem_cmp(&b), Ordering::Less);
-        assert_eq!(b.mem_cmp(&b), Ordering::Equal);
-        assert_eq!(b.mem_cmp(&c), Ordering::Greater);
+        helper!(a, b, Ordering::Less);
+        helper!(b, b, Ordering::Equal);
+        helper!(b, c, Ordering::Greater);
     }
 }
