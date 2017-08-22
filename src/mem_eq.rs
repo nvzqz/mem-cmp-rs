@@ -14,6 +14,7 @@ pub trait MemEq<Rhs: ?Sized = Self> {
 }
 
 impl<T, U> MemEq<U> for T {
+    #[inline]
     fn mem_eq(&self, other: &U) -> bool {
         size_of::<T>() == size_of::<U>() && unsafe { _memcmp(self, other) == 0 }
     }

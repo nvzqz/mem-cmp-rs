@@ -10,6 +10,7 @@ pub trait MemOrd: MemEq {
 }
 
 impl<T> MemOrd for T {
+    #[inline]
     fn mem_cmp(&self, other: &Self) -> Ordering {
         match unsafe { _memcmp(self, other) } {
             x if x < 0 => Ordering::Less,
