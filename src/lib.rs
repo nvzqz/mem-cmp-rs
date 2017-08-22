@@ -5,6 +5,7 @@ mod mem_eq;
 mod mem_ord;
 
 use core::cmp::Ordering;
+use core::mem;
 
 pub use mem_eq::*;
 pub use mem_ord::*;
@@ -12,6 +13,26 @@ pub use mem_ord::*;
 /// A type that implements comparison traits via [`MemEq`](trait.MemEq.html)
 /// and [`MemOrd`](trait.MemOrd.html).
 pub struct MemOrdered<T: ?Sized>(pub T);
+
+impl<T> From<T> for MemOrdered<T> {
+    fn from(inner: T) -> Self { MemOrdered(inner) }
+}
+
+impl<'a, T: ?Sized> From<&'a T> for &'a MemOrdered<T> {
+    fn from(inner: &T) -> Self { unsafe { mem::transmute(inner) } }
+}
+
+impl<'a, T: ?Sized> From<&'a mut T> for &'a mut MemOrdered<T> {
+    fn from(inner: &mut T) -> Self { unsafe { mem::transmute(inner) } }
+}
+
+impl<T: ?Sized> AsRef<T> for MemOrdered<T> {
+    fn as_ref(&self) -> &T { &self.0 }
+}
+
+impl<T: ?Sized> AsMut<T> for MemOrdered<T> {
+    fn as_mut(&mut self) -> &mut T { &mut self.0 }
+}
 
 impl<T: ?Sized, U: ?Sized> PartialEq<MemOrdered<U>> for MemOrdered<T>
     where T: MemEq<U>
