@@ -4,10 +4,12 @@ use ext::*;
 /// Trait for equality comparisons performed over bytes directly.
 pub trait MemEq<Rhs: ?Sized = Self> {
     /// Tests whether `self` and `other` are equal in memory.
+    #[must_use]
     fn mem_eq(&self, other: &Rhs) -> bool;
 
     /// Tests whether `self` and `other` are not equal in memory.
     #[inline]
+    #[must_use]
     fn mem_neq(&self, other: &Rhs) -> bool { !self.mem_eq(other) }
 }
 
