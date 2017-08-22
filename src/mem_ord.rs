@@ -20,16 +20,31 @@ fn convert(cmp: i32, size_a: usize, size_b: usize) -> Ordering {
 
 #[inline(always)]
 fn _mem_cmp<T, U>(this: &T, other: &U) -> Ordering {
-    let cmp = unsafe { _memcmp(this, other, 1) };
-    convert(cmp, mem::size_of::<T>(), mem::size_of::<U>())
+    use self::mem::{size_of, transmute_copy};
+    macro_rules! impl_match {
+        ($($s:expr, $t:ty);+) => {
+            match (size_of::<T>(), size_of::<U>()) {
+                $(($s, $s) => unsafe {
+                    let x: $t = transmute_copy(this);
+                    let y: $t = transmute_copy(other);
+                    x.cmp(&y)
+                },)+
+                _ => {
+                    let cmp = unsafe { _memcmp(this, other, 1) };
+                    convert(cmp, size_of::<T>(), size_of::<U>())
+                }
+            }
+        }
+    }
+    impl_match!(1, u8; 2, u16; 4, u32; 8, u64)
+}
+
+pub fn compare_arrays(a: [u8; 0], b: [u16; 0]) -> Ordering {
+    a.mem_cmp(&b)
 }
 
 impl<T, U> MemOrd<U> for T {
     #[inline]
-    #[cfg(feature = "specialization")]
-    default fn mem_cmp(&self, other: &U) -> Ordering { _mem_cmp(self, other) }
-
-    #[cfg(not(feature = "specialization"))]
     fn mem_cmp(&self, other: &U) -> Ordering { _mem_cmp(self, other) }
 }
 
@@ -43,43 +58,6 @@ impl<T, U> MemOrd<[U]> for [T] {
         };
         convert(cmp, size_a, size_b)
     }
-}
-
-macro_rules! impl_specialized {
-    ($($t:ty)+) => {
-        $(#[cfg(feature = "specialization")]
-        impl MemOrd for $t {
-            #[inline]
-            fn mem_cmp(&self, other: &Self) -> Ordering { self.cmp(other) }
-        })+
-    }
-}
-
-macro_rules! impl_specialized_dep {
-    ($($dep:ty => $($t:ty),+;)+) => {
-        $($(#[cfg(feature = "specialization")]
-        impl MemOrd for $t {
-            #[inline]
-            fn mem_cmp(&self, other: &Self) -> Ordering {
-                unsafe {
-                    let x: $dep = mem::transmute(*self);
-                    let y: $dep = mem::transmute(*other);
-                    x.mem_cmp(&y)
-                }
-            }
-        })+)+
-    }
-}
-
-impl_specialized!(u8 u16 u32 u64 usize);
-
-impl_specialized_dep! {
-    u8    => i8,  [u8; 1], [i8; 1];
-    u16   => i16, [u8; 2], [i8; 2], (u8, u8);
-    u32   => i32, [u8; 4], [i8; 4], (u8, u8, u8, u8), (u16, u16);
-    u64   => i64, [u8; 8], [i8; 8], (u8, u8, u8, u8, u8, u8, u8, u8),
-                                    (u16, u16, u16, u16), (u32, u32);
-    usize => isize;
 }
 
 #[cfg(test)]
