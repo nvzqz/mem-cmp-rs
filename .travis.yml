@@ -6,5 +6,7 @@ matrix:
       os: osx
     - rust: beta
     - rust: nightly
+    - rust: nightly
+      env: TEST_FLAGS="--features nightly"
 script:
-  - cargo test
+  - cargo test $TEST_FLAGS
