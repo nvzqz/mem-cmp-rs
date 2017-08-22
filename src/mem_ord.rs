@@ -1,5 +1,4 @@
 use core::cmp::Ordering;
-use core::mem;
 use ext::*;
 use mem_eq::MemEq;
 
@@ -44,6 +43,7 @@ macro_rules! impl_specialized_dep {
         impl MemOrd for $t {
             #[inline]
             fn mem_cmp(&self, other: &Self) -> Ordering {
+                use core::mem;
                 unsafe {
                     let x: $dep = mem::transmute(*self);
                     let y: $dep = mem::transmute(*other);
