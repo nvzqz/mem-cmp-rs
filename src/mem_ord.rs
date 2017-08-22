@@ -38,8 +38,8 @@ macro_rules! impl_specialized {
 }
 
 macro_rules! impl_specialized_dep {
-    ($dep:ty => $($t:ty),+) => {
-        $(#[cfg(feature = "specialization")]
+    ($($dep:ty => $($t:ty),+;)+) => {
+        $($(#[cfg(feature = "specialization")]
         impl MemOrd for $t {
             #[inline]
             fn mem_cmp(&self, other: &Self) -> Ordering {
@@ -50,16 +50,20 @@ macro_rules! impl_specialized_dep {
                     x.mem_cmp(&y)
                 }
             }
-        })+
+        })+)+
     }
 }
 
 impl_specialized!(u8 u16 u32 u64 usize);
-impl_specialized_dep!(u8    => i8);
-impl_specialized_dep!(u16   => i16);
-impl_specialized_dep!(u32   => i32);
-impl_specialized_dep!(u64   => i64);
-impl_specialized_dep!(usize => isize);
+
+impl_specialized_dep! {
+    u8    => i8,  [u8; 1], [i8; 1];
+    u16   => i16, [u8; 2], [i8; 2], (u8, u8);
+    u32   => i32, [u8; 4], [i8; 4], (u8, u8, u8, u8), (u16, u16);
+    u64   => i64, [u8; 8], [i8; 8], (u8, u8, u8, u8, u8, u8, u8, u8),
+                                    (u16, u16, u16, u16), (u32, u32);
+    usize => isize;
+}
 
 #[cfg(test)]
 mod tests {
