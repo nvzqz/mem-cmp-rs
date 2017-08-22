@@ -47,7 +47,6 @@
 //! [`MemEq`]: trait.MemEq.html
 //! [`MemOrd`]: trait.MemOrd.html
 
-#![cfg_attr(feature = "specialization", feature(specialization))]
 #![no_std]
 
 mod ext;

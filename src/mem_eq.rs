@@ -1,4 +1,4 @@
-use core::mem::size_of;
+use core::mem::{size_of, transmute_copy};
 use ext::*;
 
 /// Trait for equality comparisons performed over bytes directly.
@@ -20,11 +20,21 @@ fn _mem_eq<T, U>(this: &T, other: &U) -> bool {
 
 impl<T, U> MemEq<U> for T {
     #[inline]
-    #[cfg(feature = "specialization")]
-    default fn mem_eq(&self, other: &U) -> bool { _mem_eq(self, other) }
-
-    #[cfg(not(feature = "specialization"))]
-    fn mem_eq(&self, other: &U) -> bool { _mem_eq(self, other) }
+    fn mem_eq(&self, other: &U) -> bool {
+        macro_rules! impl_match {
+            ($($s:expr, $t:ty);+) => {
+                match (size_of::<T>(), size_of::<U>()) {
+                    $(($s, $s) => unsafe {
+                        let x: $t = transmute_copy(self);
+                        let y: $t = transmute_copy(other);
+                        x == y
+                    },)+
+                    _ => _mem_eq(self, other)
+                }
+            }
+        }
+        impl_match!(1, u8; 2, u16; 4, u32; 8, u64)
+    }
 }
 
 impl<T, U> MemEq<[U]> for [T] {
@@ -37,19 +47,6 @@ impl<T, U> MemEq<[U]> for [T] {
         }
     }
 }
-
-macro_rules! impl_specialized {
-    ($($t:ty)+) => {
-        $(#[cfg(feature = "specialization")]
-        impl MemEq for $t {
-            #[inline]
-            fn mem_eq(&self, other: &Self) -> bool { self == other }
-        })+
-    }
-}
-
-impl_specialized!(u8 u16 u32 u64 usize);
-impl_specialized!(i8 i16 i32 i64 isize);
 
 #[cfg(test)]
 mod tests {
