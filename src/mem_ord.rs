@@ -3,10 +3,10 @@ use ext::*;
 use mem_eq::MemEq;
 
 /// Trait for values whose bytes can be compared directly.
-pub trait MemOrd: MemEq {
+pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
     /// Returns an ordering between the memory of `self` and `other`.
     #[must_use]
-    fn mem_cmp(&self, other: &Self) -> Ordering;
+    fn mem_cmp(&self, other: &Rhs) -> Ordering;
 }
 
 #[inline(always)]
