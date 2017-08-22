@@ -24,11 +24,13 @@ impl<T, U> MemEq<U> for T {
         macro_rules! impl_match {
             ($($s:expr, $t:ty);+) => {
                 match (size_of::<T>(), size_of::<U>()) {
-                    $(($s, $s) => unsafe {
-                        let x: $t = transmute_copy(self);
-                        let y: $t = transmute_copy(other);
-                        x == y
-                    },)+
+                    $(
+                        ($s, $s) => unsafe {
+                            let x: $t = transmute_copy(self);
+                            let y: $t = transmute_copy(other);
+                            x == y
+                        },
+                    )+
                     _ => _mem_eq(self, other)
                 }
             }

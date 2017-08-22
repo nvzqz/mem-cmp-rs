@@ -17,11 +17,13 @@ impl<T, U> MemOrd<U> for T {
         macro_rules! impl_match {
             ($($s:expr, $t:ty);+) => {
                 match (size_of::<T>(), size_of::<U>()) {
-                    $(($s, $s) => unsafe {
-                        let x: $t = transmute_copy(self);
-                        let y: $t = transmute_copy(other);
-                        x.cmp(&y)
-                    },)+
+                    $(
+                        ($s, $s) => unsafe {
+                            let x: $t = transmute_copy(self);
+                            let y: $t = transmute_copy(other);
+                            x.cmp(&y)
+                        },
+                    )+
                     _ => match unsafe { _memcmp(self, other, 1) } {
                         x if x < 0 => Ordering::Less,
                         x if x > 0 => Ordering::Greater,
