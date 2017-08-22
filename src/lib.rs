@@ -9,7 +9,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! mem_cmp = "0.1.0"
+//! mem_cmp = "0.1.1"
 //! ```
 //!
 //! and this to your crate root:
