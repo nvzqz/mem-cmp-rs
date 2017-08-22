@@ -1,4 +1,5 @@
 use core::cmp::Ordering;
+use core::mem;
 use ext::*;
 use mem_eq::MemEq;
 
@@ -10,21 +11,21 @@ pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
 }
 
 #[inline(always)]
-fn _mem_cmp<T>(this: &T, other: &T) -> Ordering {
+fn _mem_cmp<T, U>(this: &T, other: &U) -> Ordering {
     match unsafe { _memcmp(this, other, 1) } {
         x if x < 0 => Ordering::Less,
         x if x > 0 => Ordering::Greater,
-        _ => Ordering::Equal,
+        _ => mem::size_of::<T>().cmp(&mem::size_of::<U>()),
     }
 }
 
-impl<T> MemOrd for T {
+impl<T, U> MemOrd<U> for T {
     #[inline]
     #[cfg(feature = "specialization")]
-    default fn mem_cmp(&self, other: &Self) -> Ordering { _mem_cmp(self, other) }
+    default fn mem_cmp(&self, other: &U) -> Ordering { _mem_cmp(self, other) }
 
     #[cfg(not(feature = "specialization"))]
-    fn mem_cmp(&self, other: &Self) -> Ordering { _mem_cmp(self, other) }
+    fn mem_cmp(&self, other: &U) -> Ordering { _mem_cmp(self, other) }
 }
 
 macro_rules! impl_specialized {
@@ -43,7 +44,6 @@ macro_rules! impl_specialized_dep {
         impl MemOrd for $t {
             #[inline]
             fn mem_cmp(&self, other: &Self) -> Ordering {
-                use core::mem;
                 unsafe {
                     let x: $dep = mem::transmute(*self);
                     let y: $dep = mem::transmute(*other);
@@ -88,5 +88,15 @@ mod tests {
             }
         }
         compare!(-1, 1, i8, i16, i32, i64, isize);
+    }
+
+    #[test]
+    fn different_sizes() {
+        let a = [0u8, 0, 0];
+        let b = [0u8, 0, 2];
+        let c = [0u8; 0];
+        assert_eq!(a.mem_cmp(&b), Ordering::Less);
+        assert_eq!(b.mem_cmp(&b), Ordering::Equal);
+        assert_eq!(b.mem_cmp(&c), Ordering::Greater);
     }
 }
