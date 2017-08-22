@@ -31,6 +31,7 @@ macro_rules! impl_specialized {
     ($($t:ty)+) => {
         $(#[cfg(feature = "specialization")]
         impl MemOrd for $t {
+            #[inline]
             fn mem_cmp(&self, other: &Self) -> Ordering { self.cmp(other) }
         })+
     }

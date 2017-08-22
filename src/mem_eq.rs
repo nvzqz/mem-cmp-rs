@@ -31,6 +31,7 @@ macro_rules! impl_specialized {
     ($($t:ty)+) => {
         $(#[cfg(feature = "specialization")]
         impl MemEq for $t {
+            #[inline]
             fn mem_eq(&self, other: &Self) -> bool { self == other }
         })+
     }
