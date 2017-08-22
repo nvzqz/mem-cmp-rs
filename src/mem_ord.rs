@@ -1,4 +1,5 @@
 use core::cmp::Ordering;
+use core::mem;
 use ext::*;
 use mem_eq::MemEq;
 
@@ -37,8 +38,28 @@ macro_rules! impl_specialized {
     }
 }
 
+macro_rules! impl_specialized_dep {
+    ($dep:ty => $($t:ty),+) => {
+        $(#[cfg(feature = "specialization")]
+        impl MemOrd for $t {
+            #[inline]
+            fn mem_cmp(&self, other: &Self) -> Ordering {
+                unsafe {
+                    let x: $dep = mem::transmute(*self);
+                    let y: $dep = mem::transmute(*other);
+                    x.mem_cmp(&y)
+                }
+            }
+        })+
+    }
+}
+
 impl_specialized!(u8 u16 u32 u64 usize);
-impl_specialized!(i8 i16 i32 i64 isize);
+impl_specialized_dep!(u8    => i8);
+impl_specialized_dep!(u16   => i16);
+impl_specialized_dep!(u32   => i32);
+impl_specialized_dep!(u64   => i64);
+impl_specialized_dep!(usize => isize);
 
 #[cfg(test)]
 mod tests {
