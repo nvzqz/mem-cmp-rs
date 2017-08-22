@@ -50,4 +50,18 @@ mod tests {
         let y = [0u8, 0, 0, 4];
         assert_eq!(x.cmp(&y), x.mem_cmp(&y));
     }
+
+    #[test]
+    fn compare_signed() {
+        macro_rules! compare {
+            ($x:expr, $y:expr, $($t:ty),+) => {
+                $({
+                    let x: $t = $x;
+                    let y: $t = $y;
+                    assert_eq!(x.mem_cmp(&y), _mem_cmp(&x, &y));
+                })+
+            }
+        }
+        compare!(-1, 1, i8, i16, i32, i64, isize);
+    }
 }
