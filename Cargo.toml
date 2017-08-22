@@ -14,3 +14,6 @@ travis-ci = { repository = "nvzqz/mem-cmp-rs" }
 [features]
 nightly = ["specialization"]
 specialization = []
+
+[package.metadata.docs.rs]
+all-features = true
