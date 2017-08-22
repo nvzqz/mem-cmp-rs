@@ -1,3 +1,4 @@
+mod ext;
 mod mem_eq;
 mod mem_ord;
 
