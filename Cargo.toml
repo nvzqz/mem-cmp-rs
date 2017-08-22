@@ -7,3 +7,6 @@ homepage = "https://github.com/nvzqz/mem-cmp-rs"
 repository = "https://github.com/nvzqz/mem-cmp-rs"
 categories = ["no-std"]
 description = "Memory comparison between types."
+
+[badges]
+travis-ci = { repository = "nvzqz/mem-cmp-rs" }
