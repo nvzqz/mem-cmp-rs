@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "specialization", feature(specialization))]
 #![no_std]
 
 mod ext;

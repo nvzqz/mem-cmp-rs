@@ -10,3 +10,7 @@ description = "Memory comparison between types."
 
 [badges]
 travis-ci = { repository = "nvzqz/mem-cmp-rs" }
+
+[features]
+nightly = ["specialization"]
+specialization = []
