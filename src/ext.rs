@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use core::mem::size_of;
 
 // External C functions are declared here to avoid depending on libc.
 extern "C" {

@@ -5,4 +5,5 @@ authors = ["Nikolai Vazquez"]
 license = "MIT/Apache-2.0"
 homepage = "https://github.com/nvzqz/mem-cmp-rs"
 repository = "https://github.com/nvzqz/mem-cmp-rs"
+categories = ["no-std"]
 description = "Memory comparison between types."
