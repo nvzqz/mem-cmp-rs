@@ -15,7 +15,7 @@ pub trait MemEq<Rhs: ?Sized = Self> {
 
 #[inline(always)]
 fn _mem_eq<T, U>(this: &T, other: &U) -> bool {
-    size_of::<T>() == size_of::<U>() && unsafe { _memcmp(this, other) == 0 }
+    size_of::<T>() == size_of::<U>() && unsafe { _memcmp(this, other, 1) == 0 }
 }
 
 impl<T, U> MemEq<U> for T {
@@ -25,6 +25,17 @@ impl<T, U> MemEq<U> for T {
 
     #[cfg(not(feature = "specialization"))]
     fn mem_eq(&self, other: &U) -> bool { _mem_eq(self, other) }
+}
+
+impl<T, U> MemEq<[U]> for [T] {
+    #[inline]
+    fn mem_eq(&self, other: &[U]) -> bool {
+        size_of::<T>() == size_of::<U>() && self.len() == other.len() && unsafe {
+            let x = self.as_ptr();
+            let y = other.as_ptr();
+            (x as usize) == (y as usize) || _memcmp(x, y, self.len()) == 0
+        }
+    }
 }
 
 macro_rules! impl_specialized {

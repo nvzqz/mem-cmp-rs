@@ -11,7 +11,7 @@ pub trait MemOrd: MemEq {
 
 #[inline(always)]
 fn _mem_cmp<T>(this: &T, other: &T) -> Ordering {
-    match unsafe { _memcmp(this, other) } {
+    match unsafe { _memcmp(this, other, 1) } {
         x if x < 0 => Ordering::Less,
         x if x > 0 => Ordering::Greater,
         _ => Ordering::Equal,
