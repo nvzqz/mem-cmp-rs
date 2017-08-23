@@ -13,11 +13,6 @@ pub trait MemEq<Rhs: ?Sized = Self> {
     fn mem_neq(&self, other: &Rhs) -> bool { !self.mem_eq(other) }
 }
 
-#[inline(always)]
-fn _mem_eq<T, U>(this: &T, other: &U) -> bool {
-    size_of::<T>() == size_of::<U>() && unsafe { _memcmp(this, other, 1) == 0 }
-}
-
 impl<T, U> MemEq<U> for T {
     #[inline]
     fn mem_eq(&self, other: &U) -> bool {
@@ -31,7 +26,9 @@ impl<T, U> MemEq<U> for T {
                             x == y
                         },
                     )+
-                    _ => _mem_eq(self, other)
+                    _ => size_of::<T>() == size_of::<U>() && unsafe {
+                        _memcmp(self, other, 1) == 0
+                    }
                 }
             }
         }
