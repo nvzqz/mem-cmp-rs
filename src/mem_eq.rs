@@ -63,7 +63,7 @@ impl<T, U> MemEq<U> for T {
         if size != size_of::<U>() { return false; }
 
         macro_rules! impl_eq {
-            ($($t:ty),+) => {
+            ($($t:ty),+ $(,)*) => {
                 $(if size == size_of::<$t>() {
                     unsafe {
                         let x: $t = transmute_copy(self);
@@ -79,7 +79,7 @@ impl<T, U> MemEq<U> for T {
             u8, u16, u32, u64,
             U128, (U128, u64),
             U256, (U256, u64), (U256, U128), (U256, U128, u64),
-            U512, (U512, u64), (U512, U256), (U512, U256, u64)
+            U512, (U512, u64), (U512, U256), (U512, U256, u64),
         }
     }
 }
