@@ -15,6 +15,7 @@ pub trait MemEq<Rhs: ?Sized = Self> {
 
 #[derive(Copy, Clone)]
 #[cfg_attr(not(feature = "simd"), derive(PartialEq))]
+#[cfg_attr(feature = "simd", repr(simd))]
 struct U128(u64, u64);
 
 #[cfg(feature = "simd")]

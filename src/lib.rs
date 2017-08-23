@@ -48,6 +48,7 @@
 //! [`MemOrd`]: trait.MemOrd.html
 
 #![no_std]
+#![cfg_attr(feature = "simd", feature(repr_simd))]
 
 #[cfg(feature = "simd")]
 extern crate simd;
