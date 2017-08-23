@@ -13,6 +13,24 @@ pub trait MemEq<Rhs: ?Sized = Self> {
     fn mem_neq(&self, other: &Rhs) -> bool { !self.mem_eq(other) }
 }
 
+#[derive(Copy, Clone)]
+#[cfg_attr(not(feature = "simd"), derive(PartialEq))]
+struct _128Bit(u64, u64);
+
+#[cfg(feature = "simd")]
+impl PartialEq for _128Bit {
+    #[inline(always)]
+    fn eq(&self, other: &Self) -> bool {
+        use core::mem::transmute;
+        use simd::u32x4;
+        unsafe {
+            let x: u32x4 = transmute(*self);
+            let y: u32x4 = transmute(*other);
+            x.eq(y).all()
+        }
+    }
+}
+
 impl<T, U> MemEq<U> for T {
     #[inline]
     fn mem_eq(&self, other: &U) -> bool {
@@ -29,18 +47,11 @@ impl<T, U> MemEq<U> for T {
                             x == y
                         },
                     )+
-                    #[cfg(feature = "simd")]
-                    16 => unsafe {
-                        use simd::u32x4;
-                        let x: u32x4 = transmute_copy(self);
-                        let y: u32x4 = transmute_copy(other);
-                        x.eq(y).all()
-                    },
                     _ =>  unsafe { _memcmp(self, other, 1) == 0 }
                 }
             }
         }
-        impl_match!(1, u8; 2, u16; 4, u32; 8, u64)
+        impl_match!(1, u8; 2, u16; 4, u32; 8, u64; 16, _128Bit)
     }
 }
 
