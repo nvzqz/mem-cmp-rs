@@ -16,18 +16,21 @@ pub trait MemEq<Rhs: ?Sized = Self> {
 impl<T, U> MemEq<U> for T {
     #[inline]
     fn mem_eq(&self, other: &U) -> bool {
+        let size = size_of::<T>();
+        if size != size_of::<U>() { return false; }
+
         macro_rules! impl_match {
             ($($s:expr, $t:ty);+) => {
-                match (size_of::<T>(), size_of::<U>()) {
+                match size {
                     $(
-                        ($s, $s) => unsafe {
+                        $s => unsafe {
                             let x: $t = transmute_copy(self);
                             let y: $t = transmute_copy(other);
                             x == y
                         },
                     )+
                     #[cfg(feature = "simd")]
-                    (16, 16) => unsafe {
+                    16 => unsafe {
                         use simd::u32x4;
                         let x: u32x4 = transmute_copy(self);
                         let y: u32x4 = transmute_copy(other);
