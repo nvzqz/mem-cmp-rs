@@ -38,20 +38,19 @@ impl<T, U> MemEq<U> for T {
         if size != size_of::<U>() { return false; }
 
         macro_rules! impl_match {
-            ($($s:expr, $t:ty);+) => {
-                match size {
-                    $(
-                        $s => unsafe {
-                            let x: $t = transmute_copy(self);
-                            let y: $t = transmute_copy(other);
-                            x == y
-                        },
-                    )+
-                    _ =>  unsafe { _memcmp(self, other, 1) == 0 }
+            ($($t:ty),+) => {
+                $(if size == size_of::<$t>() {
+                    unsafe {
+                        let x: $t = transmute_copy(self);
+                        let y: $t = transmute_copy(other);
+                        x == y
+                    }
+                } else)+ {
+                    unsafe { _memcmp(self, other, 1) == 0 }
                 }
             }
         }
-        impl_match!(1, u8; 2, u16; 4, u32; 8, u64; 16, _128Bit)
+        impl_match!(u8, u16, u32, u64, _128Bit)
     }
 }
 

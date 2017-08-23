@@ -22,24 +22,23 @@ impl<T, U> MemOrd<U> for T {
     #[inline]
     fn mem_cmp(&self, other: &U) -> Ordering {
         use self::mem::{size_of, transmute_copy};
+        let size_a = size_of::<T>();
+        let size_b = size_of::<U>();
         macro_rules! impl_match {
-            ($($s:expr, $t:ty);+) => {
-                match (size_of::<T>(), size_of::<U>()) {
-                    $(
-                        ($s, $s) => unsafe {
-                            let x: $t = transmute_copy(self);
-                            let y: $t = transmute_copy(other);
-                            x.cmp(&y)
-                        },
-                    )+
-                    _ => {
-                        let cmp = unsafe { _memcmp(self, other, 1) };
-                        convert(cmp, size_of::<T>(), size_of::<U>())
+            ($($t:ty),+) => {
+                $(if size_a == size_b && size_a == size_of::<$t>() {
+                    unsafe {
+                        let x: $t = transmute_copy(self);
+                        let y: $t = transmute_copy(other);
+                        x.cmp(&y)
                     }
+                } else)+ {
+                    let cmp = unsafe { _memcmp(self, other, 1) };
+                    convert(cmp, size_a, size_b)
                 }
             }
         }
-        impl_match!(1, u8; 2, u16; 4, u32; 8, u64)
+        impl_match!(u8, u16, u32, u64)
     }
 }
 
