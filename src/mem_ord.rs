@@ -10,6 +10,14 @@ pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
     fn mem_cmp(&self, other: &Rhs) -> Ordering;
 }
 
+fn convert(cmp: i32, size_a: usize, size_b: usize) -> Ordering {
+    match cmp {
+        _ if cmp < 0 => Ordering::Less,
+        _ if cmp > 0 => Ordering::Greater,
+        _ => size_a.cmp(&size_b)
+    }
+}
+
 impl<T, U> MemOrd<U> for T {
     #[inline]
     fn mem_cmp(&self, other: &U) -> Ordering {
@@ -24,10 +32,9 @@ impl<T, U> MemOrd<U> for T {
                             x.cmp(&y)
                         },
                     )+
-                    _ => match unsafe { _memcmp(self, other, 1) } {
-                        x if x < 0 => Ordering::Less,
-                        x if x > 0 => Ordering::Greater,
-                        _ => size_of::<T>().cmp(&size_of::<U>())
+                    _ => {
+                        let cmp = unsafe { _memcmp(self, other, 1) };
+                        convert(cmp, size_of::<T>(), size_of::<U>())
                     }
                 }
             }
