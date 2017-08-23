@@ -15,10 +15,10 @@ pub trait MemEq<Rhs: ?Sized = Self> {
 
 #[derive(Copy, Clone)]
 #[cfg_attr(not(feature = "simd"), derive(PartialEq))]
-struct _128Bit(u64, u64);
+struct U128(u64, u64);
 
 #[cfg(feature = "simd")]
-impl PartialEq for _128Bit {
+impl PartialEq for U128 {
     #[inline(always)]
     fn eq(&self, other: &Self) -> bool {
         use core::mem::transmute;
@@ -50,7 +50,7 @@ impl<T, U> MemEq<U> for T {
                 }
             }
         }
-        impl_eq!(u8, u16, u32, u64, _128Bit)
+        impl_eq!(u8, u16, u32, u64, U128)
     }
 }
 
