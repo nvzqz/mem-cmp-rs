@@ -7,6 +7,11 @@ matrix:
     - rust: beta
     - rust: nightly
     - rust: nightly
-      env: FEATURES="--features simd"
+      env:
+        - FEATURES="--features simd"
+    - rust: nightly
+      env:
+        - FEATURES="--features avx"
+        - RUSTFLAGS="-C target-feature=+avx"
 script:
   - cargo test $FEATURES

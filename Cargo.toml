@@ -11,6 +11,9 @@ description = "Memory comparison between types."
 [badges]
 travis-ci = { repository = "nvzqz/mem-cmp-rs" }
 
+[features]
+avx = ["simd"]
+
 [dependencies]
 simd = { version = "0.2.0", optional = true }
 

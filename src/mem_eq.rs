@@ -32,6 +32,30 @@ impl PartialEq for U128 {
     }
 }
 
+#[cfg(feature = "avx")]
+#[derive(Copy, Clone)]
+#[repr(simd)]
+struct U256(u64, u64, u64, u64);
+
+#[cfg(feature = "avx")]
+impl PartialEq for U256 {
+    #[inline(always)]
+    fn eq(&self, other: &Self) -> bool {
+        use core::mem::transmute;
+        use simd::x86::avx::u8x32;
+        unsafe {
+            let x: u8x32 = transmute(*self);
+            let y: u8x32 = transmute(*other);
+            x.eq(y).all()
+        }
+    }
+}
+
+#[cfg(not(feature = "avx"))]
+type U256 = (U128, U128);
+
+type U512 = (U256, U256);
+
 impl<T, U> MemEq<U> for T {
     #[inline]
     fn mem_eq(&self, other: &U) -> bool {
@@ -53,9 +77,9 @@ impl<T, U> MemEq<U> for T {
         }
         impl_eq! {
             u8, u16, u32, u64,
-            U128, (U128, u64), (U128, U128),
-            (U128, U128, u64), (U128, U128, U128),
-            (U128, U128, U128, u64), (U128, U128, U128, U128)
+            U128, (U128, u64),
+            U256, (U256, u64), (U256, U128), (U256, U128, u64),
+            U512, (U512, u64), (U512, U256), (U512, U256, u64)
         }
     }
 }
