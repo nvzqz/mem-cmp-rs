@@ -49,6 +49,9 @@
 
 #![no_std]
 
+#[cfg(feature = "simd")]
+extern crate simd;
+
 mod ext;
 mod mem_eq;
 mod mem_ord;

@@ -26,6 +26,13 @@ impl<T, U> MemEq<U> for T {
                             x == y
                         },
                     )+
+                    #[cfg(feature = "simd")]
+                    (16, 16) => unsafe {
+                        use simd::u32x4;
+                        let x: u32x4 = transmute_copy(self);
+                        let y: u32x4 = transmute_copy(other);
+                        x.eq(y).all()
+                    },
                     _ => size_of::<T>() == size_of::<U>() && unsafe {
                         _memcmp(self, other, 1) == 0
                     }
