@@ -36,9 +36,7 @@ impl<T, U> MemEq<U> for T {
                         let y: u32x4 = transmute_copy(other);
                         x.eq(y).all()
                     },
-                    _ => size_of::<T>() == size_of::<U>() && unsafe {
-                        _memcmp(self, other, 1) == 0
-                    }
+                    _ =>  unsafe { _memcmp(self, other, 1) == 0 }
                 }
             }
         }
