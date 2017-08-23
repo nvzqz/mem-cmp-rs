@@ -43,6 +43,17 @@
 //! # }
 //! ```
 //!
+//! # Safety
+//!
+//! Generally, comparing memory directly is safe. However, there are cases where
+//! undefined behavior may be encountered:
+//!
+//! - **Types with padding** — One such case is with types where the inner
+//! values are padded for alignment. Such a type would be `(u8, u32)`. It has an
+//! alignment of 4 bytes, resulting in 3 bytes of padding between the first
+//! value and the second. It's up to the compiler to decide what the byte values
+//! are for the padding.
+//!
 //! [crate]: https://crates.io/crates/mem_cmp
 //! [`MemEq`]: trait.MemEq.html
 //! [`MemOrd`]: trait.MemOrd.html
