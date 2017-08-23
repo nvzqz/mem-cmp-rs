@@ -10,14 +10,7 @@ matrix:
       env:
         - FEATURES="--features simd"
     - rust: nightly
-      env:
-        - FEATURES="--features avx"
-        - RUSTFLAGS="-C target-feature=+avx"
-        - ARCH="x86_64"
-addons:
-  apt:
-    packages:
-      - gcc-multilib
-script: |
-  curl -sSL https://raw.githubusercontent.com/carllerche/travis-rust-matrix/master/test | bash
-  cargo test $FEATURES
+      script:
+        - RUSTFLAGS="-C target-feature=+avx" cargo build --features avx
+script:
+  - cargo test $FEATURES
