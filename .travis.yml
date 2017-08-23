@@ -6,5 +6,7 @@ matrix:
       os: osx
     - rust: beta
     - rust: nightly
+    - rust: nightly
+      env: FEATURES="--features simd"
 script:
-  - cargo test
+  - cargo test $FEATURES
