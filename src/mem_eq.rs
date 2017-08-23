@@ -56,6 +56,16 @@ type U256 = (U128, U128);
 
 type U512 = (U256, U256);
 
+macro_rules! from_type {
+    ($t:ty, $x:expr, $y:expr) => {
+        unsafe {
+            let x: $t = transmute_copy($x);
+            let y: $t = transmute_copy($y);
+            x == y
+        }
+    }
+}
+
 impl<T, U> MemEq<U> for T {
     #[inline]
     fn mem_eq(&self, other: &U) -> bool {
@@ -63,13 +73,11 @@ impl<T, U> MemEq<U> for T {
         if size != size_of::<U>() { return false; }
 
         macro_rules! impl_eq {
-            ($($t:ty),+ $(,)*) => {
+            ($($t:ty),+; simd: $($s:ty),+ $(,)*) => {
                 $(if size == size_of::<$t>() {
-                    unsafe {
-                        let x: $t = transmute_copy(self);
-                        let y: $t = transmute_copy(other);
-                        x == y
-                    }
+                    from_type!($t, self, other)
+                } else)+ $(if cfg!(feature = "simd") && size == size_of::<$s>() {
+                    from_type!($s, self, other)
                 } else)+ {
                     unsafe { _memcmp(self, other, 1) == 0 }
                 }
@@ -79,7 +87,10 @@ impl<T, U> MemEq<U> for T {
             u8, u16, u32, u64,
             U128, (U128, u64),
             U256, (U256, u64), (U256, U128), (U256, U128, u64),
-            U512, (U512, u64), (U512, U256), (U512, U256, u64),
+            U512, (U512, u64), (U512, U256), (U512, U256, u64);
+
+            // These types are only used when simd is enabled
+            simd: (U512, U512), (U512, U512, U512), (U512, U512, U512, U512)
         }
     }
 }
