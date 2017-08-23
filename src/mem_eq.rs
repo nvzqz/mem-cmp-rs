@@ -37,7 +37,7 @@ impl<T, U> MemEq<U> for T {
         let size = size_of::<T>();
         if size != size_of::<U>() { return false; }
 
-        macro_rules! impl_match {
+        macro_rules! impl_eq {
             ($($t:ty),+) => {
                 $(if size == size_of::<$t>() {
                     unsafe {
@@ -50,7 +50,7 @@ impl<T, U> MemEq<U> for T {
                 }
             }
         }
-        impl_match!(u8, u16, u32, u64, _128Bit)
+        impl_eq!(u8, u16, u32, u64, _128Bit)
     }
 }
 

@@ -24,7 +24,7 @@ impl<T, U> MemOrd<U> for T {
         use self::mem::{size_of, transmute_copy};
         let size_a = size_of::<T>();
         let size_b = size_of::<U>();
-        macro_rules! impl_match {
+        macro_rules! impl_cmp {
             ($($t:ty),+) => {
                 $(if size_a == size_b && size_a == size_of::<$t>() {
                     unsafe {
@@ -38,7 +38,7 @@ impl<T, U> MemOrd<U> for T {
                 }
             }
         }
-        impl_match!(u8, u16, u32, u64)
+        impl_cmp!(u8, u16, u32, u64)
     }
 }
 
