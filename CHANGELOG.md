@@ -39,7 +39,7 @@ All releases of **mem_cmp** adhere to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## [v1.0.0](https://github.com/nvzqz/mem-cmp-rs/tree/v1.0.0) (2015-10-22)
+## [v1.0.0](https://github.com/nvzqz/mem-cmp-rs/tree/v1.0.0) (2017-08-22)
 
 - [Release](https://github.com/nvzqz/mem-cmp-rs/releases/tag/v1.0.0)
 
