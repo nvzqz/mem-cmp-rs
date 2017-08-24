@@ -12,10 +12,9 @@ pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
 
 #[inline(always)]
 fn convert(cmp: i32, size_a: usize, size_b: usize) -> Ordering {
-    match cmp {
-        _ if cmp < 0 => Ordering::Less,
-        _ if cmp > 0 => Ordering::Greater,
-        _ => size_a.cmp(&size_b)
+    match cmp.cmp(&0) {
+        Ordering::Equal => size_a.cmp(&size_b),
+        x => x
     }
 }
 
