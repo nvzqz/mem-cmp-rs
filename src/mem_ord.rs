@@ -10,6 +10,7 @@ pub trait MemOrd<Rhs: ?Sized = Self>: MemEq<Rhs> {
     fn mem_cmp(&self, other: &Rhs) -> Ordering;
 }
 
+#[inline(always)]
 fn convert(cmp: i32, size_a: usize, size_b: usize) -> Ordering {
     match cmp {
         _ if cmp < 0 => Ordering::Less,
