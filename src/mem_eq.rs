@@ -1,4 +1,4 @@
-use core::mem::{size_of, transmute_copy};
+use core::mem::{size_of, size_of_val, transmute_copy};
 use ext::*;
 
 /// Trait for equality comparisons performed over bytes directly.
@@ -95,14 +95,29 @@ impl<T, U> MemEq<U> for T {
     }
 }
 
+#[inline(always)]
+fn _mem_eq<T: ?Sized, U: ?Sized>(a: &T, b: &U) -> bool {
+    let size = size_of_val(a);
+    size == size_of_val(b) && unsafe {
+        let x = a as *const _ as _;
+        let y = b as *const _ as _;
+        (x as usize) == (y as usize) || memcmp(x, y, size) == 0
+    }
+}
+
+#[cfg(feature = "specialization")]
+impl<T: ?Sized, U: ?Sized> MemEq<U> for T {
+    #[inline]
+    default fn mem_eq(&self, other: &U) -> bool {
+        _mem_eq(self, other)
+    }
+}
+
+#[cfg(not(feature = "specialization"))]
 impl<T, U> MemEq<[U]> for [T] {
     #[inline]
     fn mem_eq(&self, other: &[U]) -> bool {
-        size_of::<T>() == size_of::<U>() && self.len() == other.len() && unsafe {
-            let x = self.as_ptr();
-            let y = other.as_ptr();
-            (x as usize) == (y as usize) || _memcmp(x, y, self.len()) == 0
-        }
+        _mem_eq(self, other)
     }
 }
 

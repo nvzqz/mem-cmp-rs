@@ -13,6 +13,8 @@ travis-ci = { repository = "nvzqz/mem-cmp-rs" }
 
 [features]
 avx = ["simd"]
+nightly = ["specialization"]
+specialization = []
 
 [dependencies]
 simd = { version = "0.2.0", optional = true }

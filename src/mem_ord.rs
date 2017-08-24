@@ -42,15 +42,30 @@ impl<T, U> MemOrd<U> for T {
     }
 }
 
+#[inline(always)]
+fn _mem_cmp<T: ?Sized, U: ?Sized>(a: &T, b: &U) -> Ordering {
+    let size_a = mem::size_of_val(a);
+    let size_b = mem::size_of_val(b);
+    let cmp = unsafe {
+        let size = cmp::min(size_a, size_b);
+        memcmp(a as *const _ as _, b as *const _ as _, size)
+    };
+    convert(cmp, size_a, size_b)
+}
+
+#[cfg(feature = "specialization")]
+impl<T: ?Sized, U: ?Sized> MemOrd<U> for T {
+    #[inline]
+    default fn mem_cmp(&self, other: &U) -> Ordering {
+        _mem_cmp(self, other)
+    }
+}
+
+#[cfg(not(feature = "specialization"))]
 impl<T, U> MemOrd<[U]> for [T] {
+    #[inline]
     fn mem_cmp(&self, other: &[U]) -> Ordering {
-        let size_a = mem::size_of_val(self);
-        let size_b = mem::size_of_val(other);
-        let cmp = unsafe {
-            let size = cmp::min(size_a, size_b);
-            memcmp(self.as_ptr() as _, other.as_ptr() as _, size)
-        };
-        convert(cmp, size_a, size_b)
+        _mem_cmp(self, other)
     }
 }
 

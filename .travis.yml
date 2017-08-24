@@ -8,6 +8,9 @@ matrix:
     - rust: nightly
     - rust: nightly
       env:
+        - FEATURES="--features nightly"
+    - rust: nightly
+      env:
         - FEATURES="--features simd"
     - rust: nightly
       script:

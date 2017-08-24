@@ -62,6 +62,7 @@
 
 #![no_std]
 #![cfg_attr(feature = "simd", feature(repr_simd))]
+#![cfg_attr(feature = "specialization", feature(specialization))]
 
 #[cfg(feature = "simd")]
 extern crate simd;
