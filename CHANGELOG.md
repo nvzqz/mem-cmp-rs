@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog] and this project adheres to
 [Semantic Versioning].
 
 ## [Unreleased]
+### Fixed
+- Now using pointer casts instead of transmute for `MemOrdered` conversions
 
 ## [0.1.3] - 2017-08-24
 ### Added

@@ -1,5 +1,4 @@
 use core::cmp::Ordering;
-use core::mem;
 use mem_eq::*;
 use mem_ord::*;
 
@@ -12,11 +11,15 @@ impl<T> From<T> for MemOrdered<T> {
 }
 
 impl<'a, T: ?Sized> From<&'a T> for &'a MemOrdered<T> {
-    fn from(inner: &T) -> Self { unsafe { mem::transmute(inner) } }
+    fn from(inner: &T) -> Self {
+        unsafe { &*(inner as *const T as *const _) }
+    }
 }
 
 impl<'a, T: ?Sized> From<&'a mut T> for &'a mut MemOrdered<T> {
-    fn from(inner: &mut T) -> Self { unsafe { mem::transmute(inner) } }
+    fn from(inner: &mut T) -> Self {
+        unsafe { &mut *(inner as *mut T as *mut _) }
+     }
 }
 
 impl<T: ?Sized> AsRef<T> for MemOrdered<T> {
