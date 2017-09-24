@@ -1,46 +1,37 @@
-# Change Log
+# Changelog [![Crates.io][crate-badge]][crate]
+All notable changes to this project will be documented in this file.
 
-All releases of **mem_cmp** adhere to [Semantic Versioning](http://semver.org/).
+The format is based on [Keep a Changelog] and this project adheres to
+[Semantic Versioning].
 
----
+## [Unreleased]
 
-## [v0.1.3](https://github.com/nvzqz/mem-cmp-rs/tree/v0.1.3) (2017-08-24)
-
-- [Changes](https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.2...v0.1.3)
-- [Release](https://github.com/nvzqz/mem-cmp-rs/releases/tag/v0.1.3)
-
-### New Features
+## [0.1.3] - 2017-08-24
+### Added
 - `MemOrd` impl for mixed types and slices
 - `MemEq` + `MemOrd` impl for all un-sized types through specialization feature
+- `MemEq` optimization using simd instructions for types of certain sizes
+  - Includes avx for x86 targets
 
-### Improvements
-- Optimized `MemEq` to use simd instructions for types of certain sizes
-    - Includes avx for x86 targets
-
----
-
-## [v0.1.2](https://github.com/nvzqz/mem-cmp-rs/tree/v0.1.2) (2017-08-22)
-
-- [Changes](https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.1...v0.1.2)
-- [Release](https://github.com/nvzqz/mem-cmp-rs/releases/tag/v0.1.2)
-
-### Fixes
+## [0.1.2] - 2017-08-22
+### Fixed
 - Fixed `MemOrd` impl for signed integers
 
----
-
-## [v0.1.1](https://github.com/nvzqz/mem-cmp-rs/tree/v0.1.1) (2017-08-22)
-
-- [Changes](https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.0...v0.1.1)
-- [Release](https://github.com/nvzqz/mem-cmp-rs/releases/tag/v0.1.1)
-
-### New Features
+## [0.1.1] - 2017-08-22
+### Added
 - Implemented `MemEq` for slices (`&[T]`)
 
----
-
-## [v1.0.0](https://github.com/nvzqz/mem-cmp-rs/tree/v1.0.0) (2017-08-22)
-
-- [Release](https://github.com/nvzqz/mem-cmp-rs/releases/tag/v1.0.0)
+## 1.0.0 - 2017-08-22
 
 Initial release
+
+[crate]:       https://crates.io/crates/mem_cmp
+[crate-badge]: https://img.shields.io/crates/v/mem_cmp.svg
+
+[Keep a Changelog]:    http://keepachangelog.com/en/1.0.0/
+[Semantic Versioning]: http://semver.org/spec/v2.0.0.html
+
+[Unreleased]: https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/nvzqz/mem-cmp-rs/compare/v0.1.0...v0.1.1
