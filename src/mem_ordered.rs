@@ -19,7 +19,7 @@ impl<'a, T: ?Sized> From<&'a T> for &'a MemOrdered<T> {
 impl<'a, T: ?Sized> From<&'a mut T> for &'a mut MemOrdered<T> {
     fn from(inner: &mut T) -> Self {
         unsafe { &mut *(inner as *mut T as *mut _) }
-     }
+    }
 }
 
 impl<T: ?Sized> AsRef<T> for MemOrdered<T> {
