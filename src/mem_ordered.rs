@@ -25,43 +25,51 @@ pub struct MemOrdered<T: ?Sized>(pub T);
 /// All types used **_must_** adhere to [these safety rules](index.html#safety).
 impl<T> MemOrdered<T> {
     /// Creates a slice of memory-ordered elements.
+    #[inline]
     pub fn from_slice(slice: &[T]) -> &[MemOrdered<T>] {
         unsafe { &*(slice as *const _ as *const _) }
     }
 
     /// Creates a mutable slice of memory-ordered elements.
+    #[inline]
     pub fn from_mut_slice(slice: &mut [T]) -> &mut [MemOrdered<T>] {
         unsafe { &mut *(slice as *mut _ as *mut _) }
     }
 }
 
 impl<T> From<T> for MemOrdered<T> {
+    #[inline]
     fn from(inner: T) -> Self { MemOrdered(inner) }
 }
 
 impl<'a, T: ?Sized> From<&'a T> for &'a MemOrdered<T> {
+    #[inline]
     fn from(inner: &T) -> Self {
         unsafe { &*(inner as *const T as *const _) }
     }
 }
 
 impl<'a, T: ?Sized> From<&'a mut T> for &'a mut MemOrdered<T> {
+    #[inline]
     fn from(inner: &mut T) -> Self {
         unsafe { &mut *(inner as *mut T as *mut _) }
     }
 }
 
 impl<T: ?Sized> AsRef<T> for MemOrdered<T> {
+    #[inline]
     fn as_ref(&self) -> &T { &self.0 }
 }
 
 impl<T: ?Sized> AsMut<T> for MemOrdered<T> {
+    #[inline]
     fn as_mut(&mut self) -> &mut T { &mut self.0 }
 }
 
 impl<T: ?Sized, U: ?Sized> PartialEq<MemOrdered<U>> for MemOrdered<T>
     where T: MemEq<U>
 {
+    #[inline]
     fn eq(&self, other: &MemOrdered<U>) -> bool {
         self.0.mem_eq(&other.0)
     }
@@ -70,12 +78,14 @@ impl<T: ?Sized, U: ?Sized> PartialEq<MemOrdered<U>> for MemOrdered<T>
 impl<T> Eq for MemOrdered<T> {}
 
 impl<T: ?Sized + MemOrd> PartialOrd for MemOrdered<T> {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.0.mem_cmp(&other.0))
     }
 }
 
 impl<T: MemOrd> Ord for MemOrdered<T> {
+    #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.mem_cmp(&other.0)
     }
