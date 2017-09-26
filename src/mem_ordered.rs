@@ -12,7 +12,7 @@ use mem_ord::*;
 ///
 /// let mut values = [-1, 4, 7, 3];
 ///
-/// MemOrdered::from_slice_mut(&mut values).sort();
+/// MemOrdered::from_mut_slice(&mut values).sort();
 ///
 /// assert_eq!(values, [3, 4, 7, -1]);
 /// ```
@@ -30,7 +30,7 @@ impl<T> MemOrdered<T> {
     }
 
     /// Creates a mutable slice of memory-ordered elements.
-    pub fn from_slice_mut(slice: &mut [T]) -> &mut [MemOrdered<T>] {
+    pub fn from_mut_slice(slice: &mut [T]) -> &mut [MemOrdered<T>] {
         unsafe { &mut *(slice as *mut _ as *mut _) }
     }
 }
