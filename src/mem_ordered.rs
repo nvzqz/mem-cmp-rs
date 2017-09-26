@@ -4,6 +4,18 @@ use mem_ord::*;
 
 /// A type that implements comparison traits via [`MemEq`](trait.MemEq.html)
 /// and [`MemOrd`](trait.MemOrd.html).
+///
+/// # Examples
+///
+/// ```
+/// use mem_cmp::MemOrdered;
+///
+/// let mut values = [-1, 4, 7, 3];
+///
+/// MemOrdered::from_slice_mut(&mut values).sort();
+///
+/// assert_eq!(values, [3, 4, 7, -1]);
+/// ```
 pub struct MemOrdered<T: ?Sized>(pub T);
 
 /// Slice conversions.
