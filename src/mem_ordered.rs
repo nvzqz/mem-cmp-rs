@@ -78,9 +78,11 @@ impl<T: ?Sized, U: ?Sized> PartialEq<MemOrdered<U>> for MemOrdered<T>
 
 impl<T> Eq for MemOrdered<T> {}
 
-impl<T: ?Sized + MemOrd> PartialOrd for MemOrdered<T> {
+impl<T: ?Sized, U: ?Sized> PartialOrd<MemOrdered<U>> for MemOrdered<T>
+    where T: MemOrd<U>
+{
     #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &MemOrdered<U>) -> Option<Ordering> {
         Some(self.0.mem_cmp(&other.0))
     }
 }
