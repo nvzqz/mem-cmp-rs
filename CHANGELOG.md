@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog] and this project adheres to
 
 ## [Unreleased]
 ### Added
+- Derive `Clone`, `Copy`, `Debug`, `Default`, and `Hash` for `MemOrdered`
 - `#[inline]` attribute to all `pub` functions
 - Slice conversion methods to `MemOrdered`
 

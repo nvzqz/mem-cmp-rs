@@ -16,6 +16,7 @@ use mem_ord::*;
 ///
 /// assert_eq!(values, [3, 4, 7, -1]);
 /// ```
+#[derive(Clone, Copy, Debug, Default, Hash)]
 pub struct MemOrdered<T: ?Sized>(pub T);
 
 /// Slice conversions.
