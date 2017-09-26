@@ -27,8 +27,6 @@
 //! If the only thing that matters is equality, [`MemEq`] is also available.
 //!
 //! ```
-//! # extern crate mem_cmp;
-//! # fn main() {
 //! use mem_cmp::*;
 //!
 //! let a = [0u8; 256];
@@ -40,7 +38,6 @@
 //!
 //! // Also works with types of different sizes:
 //! assert!(a.mem_neq(&42));
-//! # }
 //! ```
 //!
 //! # Safety
