@@ -6,6 +6,23 @@ use mem_ord::*;
 /// and [`MemOrd`](trait.MemOrd.html).
 pub struct MemOrdered<T: ?Sized>(pub T);
 
+/// Slice conversions.
+///
+/// # Safety
+///
+/// All types used **_must_** adhere to [these safety rules](index.html#safety).
+impl<T> MemOrdered<T> {
+    /// Creates a slice of memory-ordered elements.
+    pub fn from_slice(slice: &[T]) -> &[MemOrdered<T>] {
+        unsafe { &*(slice as *const _ as *const _) }
+    }
+
+    /// Creates a mutable slice of memory-ordered elements.
+    pub fn from_slice_mut(slice: &mut [T]) -> &mut [MemOrdered<T>] {
+        unsafe { &mut *(slice as *mut _ as *mut _) }
+    }
+}
+
 impl<T> From<T> for MemOrdered<T> {
     fn from(inner: T) -> Self { MemOrdered(inner) }
 }

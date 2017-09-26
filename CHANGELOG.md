@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 [Semantic Versioning].
 
 ## [Unreleased]
+### Added
+- Slice conversion methods to `MemOrdered`
+
 ### Fixed
 - Now using pointer casts instead of transmute for `MemOrdered` conversions
 
